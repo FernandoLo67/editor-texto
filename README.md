@@ -100,7 +100,17 @@ El recorte de prefijo y sufijo tiene una trampa: si se pasan de largo, se solapa
 
 **`VentanaEditor` lleva `serialVersionUID` y campos `transient`.** No porque tenga sentido serializar una ventana, sino porque `JFrame` es serializable y esa obligacion se hereda sin quererla. Es uno de los precios de extender una clase de Swing en vez de componerla.
 
-## Las 48 pruebas
+## Busqueda con expresiones regulares
+
+`BuscadorRegex` agrega busqueda y reemplazo por regex al editor, usando `java.util.regex`:
+
+- `buscar(texto, patron)` devuelve una lista inmutable de `Coincidencia` con posicion, longitud y texto encontrado
+- `buscarIgnorandoMayusculas` compila el patron con `CASE_INSENSITIVE`
+- `reemplazar(texto, patron, reemplazo)` soporta referencias a grupos (`$1`, `$2`), lo que permite transformaciones como invertir "apellido, nombre" a "nombre apellido" con un solo patron
+
+Cada `Coincidencia` es un objeto inmutable — no una posicion que se invalide al editar el texto. El patron se compila una sola vez por llamada, y un patron invalido lanza `PatternSyntaxException` sin envolver, porque es un error del usuario que necesita el mensaje original del compilador de regex.
+
+## Las 60 pruebas
 
 **`DocumentoTextoTest` (38)**
 
@@ -121,12 +131,14 @@ El recorte de prefijo y sufijo tiene una trampa: si se pasan de largo, se solapa
 src/main/java/com/fernando/editor/
 ├── Cambio.java           Record: el delta que guarda el historial.
 ├── DocumentoTexto.java   Buffer, deshacer/rehacer y estado guardado.
+├── BuscadorRegex.java    Busqueda y reemplazo con java.util.regex.
 ├── ArchivoTexto.java     Lectura y escritura atomica en UTF-8.
 ├── VentanaEditor.java    Swing; solo conecta la logica con la pantalla.
 └── Main.java             Arranca la ventana.
 src/test/java/com/fernando/editor/
 ├── DocumentoTextoTest.java  38 pruebas.
-└── ArchivoTextoTest.java    10 pruebas.
+├── ArchivoTextoTest.java    10 pruebas.
+└── BuscadorRegexTest.java   12 pruebas.
 ```
 
 ## Como ejecutar
